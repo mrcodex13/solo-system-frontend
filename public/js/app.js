@@ -1,7 +1,6 @@
 // ══════════════════════════════════════
 // CONFIG — change this to your backend URL after deploying
 // ══════════════════════════════════════
-//const API = 'http://localhost:5000/api'
 const API = 'https://solo-system-backend-production.up.railway.app/api';
 // During local testing use: const API = 'http://localhost:5000/api';
 
@@ -281,18 +280,7 @@ function checkPenalty(){
       Object.keys(S.stats||{}).forEach(k=>S.stats[k].val=Math.max(1,S.stats[k].val-3));
       const missedDomains=[...new Set(missed.map(q=>q.domain))];
       missedDomains.forEach(d=>S.streaks[d]=0);
-      missed.forEach(q=>S.quests.push({
-        id: S.nextId++,
-        name: `[PENALTY] ${q.name}`,
-        domain: q.domain,
-        stat: q.stat,
-        diff: 'hard',
-        baseXp: Math.round(q.baseXp*0.5),
-        reminderTime: '',
-        done: false,
-        isPenalty: true,
-        mult: null
-      }));
+      missed.forEach(q=>S.quests.push({id:S.nextId++,name:`[PENALTY] ${q.name}`,domain:q.domain,stat:q.stat,diff:'hard',baseXp:Math.round(q.baseXp*0.5),done:false,isPenalty:true,mult:null}));
       showAlert('penalty','☠ PENALTY ZONE',`${missed.length} quests missed.`);
       scheduleSave();
     }
