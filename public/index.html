@@ -1,953 +1,330 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE SYSTEM</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
-<style>
-:root{
-  --blue:#00d4ff;--blue-dim:#0099bb;--blue-glow:rgba(0,212,255,0.3);
-  --purple:#7b2fff;--purple-glow:rgba(123,47,255,0.3);
-  --gold:#ffd700;--gold-glow:rgba(255,215,0,0.3);
-  --red:#ff3366;--red-glow:rgba(255,51,102,0.3);
-  --green:#00ff88;--green-glow:rgba(0,255,136,0.3);
-  --orange:#ff8800;
-  --personal:#00d4ff;--fitness:#00ff88;--academic:#c678ff;
-  --bg:#050810;--bg2:#080d1a;
-  --panel:rgba(10,20,45,0.85);--border:rgba(0,212,255,0.18);
-  --text:#c8e8ff;--text-dim:rgba(200,232,255,0.5);
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-body::after{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 50%,rgba(123,47,255,0.06) 0%,transparent 60%),radial-gradient(ellipse at 85% 20%,rgba(0,212,255,0.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
-.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 90px;}
-
-.scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0.1;animation:scan 9s linear infinite;pointer-events:none;z-index:999;}
-@keyframes scan{0%{top:-2px}100%{top:100vh}}
-
-/* AUTH SCREEN */
-.auth-screen{position:fixed;inset:0;background:var(--bg);z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;}
-.auth-screen.hidden{display:none;}
-.auth-box{width:100%;max-width:400px;background:var(--panel);border:1px solid var(--border);border-top:3px solid var(--blue);padding:32px 28px;box-shadow:0 0 50px var(--blue-glow);}
-.auth-logo{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:5px;color:var(--blue);margin-bottom:6px;}
-.auth-title{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:#fff;text-shadow:0 0 20px var(--blue-glow);margin-bottom:4px;}
-.auth-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:24px;}
-.auth-tabs{display:flex;margin-bottom:20px;border-bottom:1px solid var(--border);}
-.auth-tab{flex:1;text-align:center;padding:8px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;bottom:-1px;}
-.auth-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
-.auth-label{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px;margin-top:12px;}
-.auth-input{width:100%;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.2);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:500;padding:11px 14px;outline:none;transition:border-color 0.2s;margin-bottom:2px;}
-.auth-input:focus{border-color:var(--blue);}
-.auth-btn{width:100%;background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(0,212,255,0.08));border:1px solid var(--blue);color:var(--blue);padding:13px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;cursor:pointer;transition:all 0.2s;margin-top:16px;}
-.auth-btn:hover{background:rgba(0,212,255,0.2);box-shadow:0 0 20px var(--blue-glow);}
-.auth-error{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);margin-top:10px;min-height:16px;}
-
-/* SYNC STATUS */
-.sync-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 16px;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border);}
-.sync-status{font-family:'Share Tech Mono',monospace;font-size:10px;display:flex;align-items:center;gap:6px;}
-.sync-dot{width:6px;height:6px;border-radius:50%;}
-.sync-dot.ok{background:var(--green);box-shadow:0 0 6px var(--green);}
-.sync-dot.saving{background:var(--gold);animation:blink 0.8s infinite;}
-.sync-dot.error{background:var(--red);}
-.logout-btn{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:3px 8px;cursor:pointer;transition:all 0.2s;}
-.logout-btn:hover{border-color:var(--red);color:var(--red);}
-
-/* ALERT */
-.system-alert{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-150px);border-top:3px solid var(--blue);padding:14px 20px;width:calc(100% - 32px);max-width:440px;z-index:1000;transition:transform 0.45s cubic-bezier(0.16,1,0.3,1);backdrop-filter:blur(20px);}
-.system-alert.normal{background:linear-gradient(135deg,rgba(0,5,20,0.97),rgba(10,25,60,0.97));border:1px solid var(--border);border-top:3px solid var(--blue);box-shadow:0 0 30px var(--blue-glow);}
-.system-alert.success{background:linear-gradient(135deg,rgba(0,20,10,0.97),rgba(0,40,20,0.97));border:1px solid rgba(0,255,136,0.25);border-top:3px solid var(--green);box-shadow:0 0 30px var(--green-glow);}
-.system-alert.warning{background:linear-gradient(135deg,rgba(20,10,0,0.97),rgba(50,25,0,0.97));border:1px solid rgba(255,136,0,0.3);border-top:3px solid var(--orange);}
-.system-alert.penalty{background:linear-gradient(135deg,rgba(30,0,10,0.97),rgba(60,5,20,0.97));border:1px solid rgba(255,51,102,0.35);border-top:3px solid var(--red);box-shadow:0 0 30px var(--red-glow);}
-.system-alert.show{transform:translateX(-50%) translateY(0);}
-.alert-header{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;margin-bottom:5px;color:var(--blue);}
-.alert-msg{font-family:'Share Tech Mono',monospace;font-size:13px;color:#fff;}
-.alert-sub{font-size:11px;color:var(--text-dim);margin-top:4px;font-family:'Share Tech Mono',monospace;}
-.xp-popup{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);font-family:'Orbitron',monospace;font-size:22px;font-weight:900;pointer-events:none;opacity:0;z-index:998;}
-.xp-popup.show{animation:popUp 1.5s ease forwards;}
-@keyframes popUp{0%{opacity:0;transform:translateX(-50%) translateY(0)}20%{opacity:1}80%{opacity:1;transform:translateX(-50%) translateY(-50px)}100%{opacity:0;transform:translateX(-50%) translateY(-70px)}}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
-
-/* HEADER */
-.header{padding:16px 16px 0;}
-.system-label{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:5px;color:var(--blue);opacity:0.65;margin-bottom:3px;}
-.hunter-name{font-family:'Orbitron',monospace;font-size:21px;font-weight:900;color:#fff;text-shadow:0 0 20px var(--blue-glow);letter-spacing:2px;}
-.rank-badge{display:inline-block;font-family:'Orbitron',monospace;font-size:10px;font-weight:600;padding:3px 10px;background:linear-gradient(135deg,var(--purple),#5500cc);border:1px solid rgba(123,47,255,0.5);border-radius:2px;color:#fff;margin-top:5px;box-shadow:0 0 15px var(--purple-glow);}
-.level-panel{margin:12px 0 0;background:var(--panel);border:1px solid var(--border);padding:14px 18px;position:relative;overflow:hidden;}
-.level-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);}
-.level-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.level-num{font-family:'Orbitron',monospace;font-size:44px;font-weight:900;line-height:1;color:var(--blue);text-shadow:0 0 30px var(--blue-glow);}
-.level-label{font-size:10px;letter-spacing:3px;color:var(--text-dim);font-family:'Orbitron',monospace;}
-.xp-info{text-align:right;}
-.xp-val{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--blue);}
-.xp-label{font-size:10px;color:var(--text-dim);letter-spacing:2px;}
-.xp-bar-wrap{background:rgba(0,212,255,0.08);height:5px;border:1px solid rgba(0,212,255,0.12);overflow:hidden;}
-.xp-bar{height:100%;background:linear-gradient(90deg,var(--blue-dim),var(--blue));box-shadow:0 0 10px var(--blue);transition:width 1s ease;}
-.cutoff-strip{margin:8px 0 0;background:rgba(0,212,255,0.04);border:1px solid var(--border);padding:9px 16px;display:flex;align-items:center;justify-content:space-between;}
-.cutoff-label{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--text-dim);}
-.cutoff-time{font-family:'Share Tech Mono',monospace;font-size:15px;color:var(--blue);}
-.cutoff-edit{font-family:'Orbitron',monospace;font-size:8px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:4px 10px;cursor:pointer;transition:all 0.2s;}
-.cutoff-edit:hover{border-color:var(--blue);color:var(--blue);}
-.live-clock{display:flex;justify-content:space-between;align-items:center;padding:7px 2px 0;}
-.clock-now{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);}
-.time-status{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;padding:3px 10px;border:1px solid;}
-.time-status.ok{color:var(--green);border-color:var(--green);}
-.time-status.warning{color:var(--orange);border-color:var(--orange);animation:blink 1s infinite;}
-.time-status.late{color:var(--red);border-color:var(--red);animation:blink 0.5s infinite;}
-.perf-btn{margin:10px 0 0;width:100%;background:linear-gradient(135deg,rgba(123,47,255,0.2),rgba(0,212,255,0.1));border:1px solid rgba(123,47,255,0.5);color:#fff;padding:12px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;}
-.perf-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent);}
-.perf-btn:hover{background:linear-gradient(135deg,rgba(123,47,255,0.35),rgba(0,212,255,0.2));box-shadow:0 0 25px var(--purple-glow);}
-
-/* TABS */
-.tabs{display:flex;margin:12px 16px 0;border-bottom:1px solid var(--border);}
-.tab{flex:1;text-align:center;padding:9px 2px;font-family:'Orbitron',monospace;font-size:8px;letter-spacing:1.5px;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;position:relative;bottom:-1px;}
-.tab.active{color:var(--blue);border-bottom-color:var(--blue);text-shadow:0 0 10px var(--blue-glow);}
-.section{display:none;padding:14px 16px;}
-.section.active{display:block;}
-.section-title{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--blue);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
-
-/* DOMAIN FILTER */
-.domain-filter{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-.df-btn{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;padding:5px 12px;border:1px solid;background:transparent;cursor:pointer;transition:all 0.2s;}
-.df-btn.all{color:var(--blue);border-color:rgba(0,212,255,0.3);}
-.df-btn.all.active{background:rgba(0,212,255,0.15);border-color:var(--blue);}
-.df-btn.personal{color:var(--personal);border-color:rgba(0,212,255,0.3);}
-.df-btn.personal.active{background:rgba(0,212,255,0.12);border-color:var(--personal);}
-.df-btn.fitness{color:var(--fitness);border-color:rgba(0,255,136,0.3);}
-.df-btn.fitness.active{background:rgba(0,255,136,0.1);border-color:var(--fitness);}
-.df-btn.academic{color:var(--academic);border-color:rgba(198,120,255,0.3);}
-.df-btn.academic.active{background:rgba(198,120,255,0.1);border-color:var(--academic);}
-
-/* QUEST CARD */
-.penalty-banner{background:linear-gradient(135deg,rgba(255,51,102,0.1),rgba(80,0,20,0.08));border:1px solid rgba(255,51,102,0.4);border-left:4px solid var(--red);padding:14px 16px;margin-bottom:12px;display:none;}
-.penalty-banner.show{display:block;}
-.penalty-title{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--red);margin-bottom:5px;}
-.penalty-desc{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text);line-height:1.6;}
-.quest-card{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--blue);padding:13px 15px;margin-bottom:9px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
-.quest-card:hover:not(.completed){box-shadow:0 0 18px rgba(0,212,255,0.08);}
-.quest-card.completed{opacity:0.5;cursor:default;}
-.quest-card.domain-personal{border-left-color:var(--personal);}
-.quest-card.domain-fitness{border-left-color:var(--fitness);}
-.quest-card.domain-academic{border-left-color:var(--academic);}
-.quest-card.penalty-quest{border-left-color:var(--red);}
-.domain-pill{display:inline-block;font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;padding:2px 8px;border:1px solid;margin-bottom:4px;}
-.domain-pill.personal{color:var(--personal);border-color:rgba(0,212,255,0.3);}
-.domain-pill.fitness{color:var(--fitness);border-color:rgba(0,255,136,0.3);}
-.domain-pill.academic{color:var(--academic);border-color:rgba(198,120,255,0.3);}
-.domain-pill.penalty{color:var(--red);border-color:rgba(255,51,102,0.3);}
-.quest-name{font-size:15px;font-weight:600;color:#fff;margin-bottom:7px;padding-right:80px;}
-.quest-meta{display:flex;gap:9px;align-items:center;flex-wrap:wrap;}
-.quest-xp{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--gold);}
-.quest-stat{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--blue-dim);}
-.quest-diff{font-family:'Orbitron',monospace;font-size:7px;padding:2px 6px;border:1px solid;}
-.quest-diff.easy{color:var(--green);border-color:var(--green);}
-.quest-diff.medium{color:var(--gold);border-color:var(--gold);}
-.quest-diff.hard{color:var(--red);border-color:var(--red);}
-.xp-preview{display:flex;gap:5px;margin-top:7px;}
-.xp-tag{font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 7px;border:1px solid;}
-.xp-tag.early-tag{color:var(--gold);border-color:rgba(255,215,0,0.25);}
-.xp-tag.ontime-tag{color:var(--green);border-color:rgba(0,255,136,0.25);}
-.xp-tag.late-tag{color:var(--orange);border-color:rgba(255,136,0,0.25);}
-.quest-timer{font-family:'Share Tech Mono',monospace;font-size:11px;margin-top:5px;}
-.quest-timer.ok{color:var(--green);}
-.quest-timer.soon{color:var(--orange);}
-.quest-timer.overdue{color:var(--red);}
-.done-badge{position:absolute;top:13px;right:13px;font-family:'Orbitron',monospace;font-size:8px;}
-.done-badge.full{color:var(--green);}
-.done-badge.early{color:var(--gold);}
-.done-badge.late{color:var(--orange);}
-.add-quest-btn{width:100%;background:transparent;border:1px dashed rgba(0,212,255,0.25);color:var(--text-dim);padding:11px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;cursor:pointer;transition:all 0.2s;margin-top:4px;}
-.add-quest-btn:hover{border-color:var(--blue);color:var(--blue);}
-
-/* STATS */
-.stat-points-banner{background:linear-gradient(135deg,rgba(123,47,255,0.15),rgba(0,212,255,0.08));border:1px solid rgba(123,47,255,0.35);padding:11px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
-.points-label{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);}
-.points-val{font-family:'Orbitron',monospace;font-size:18px;font-weight:800;color:var(--purple);text-shadow:0 0 15px var(--purple-glow);}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
-.stat-card{background:var(--panel);border:1px solid var(--border);padding:13px;position:relative;overflow:hidden;cursor:pointer;transition:all 0.2s;}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.stat-card.str::before{background:linear-gradient(90deg,var(--red),transparent);}
-.stat-card.agi::before{background:linear-gradient(90deg,var(--green),transparent);}
-.stat-card.int::before{background:linear-gradient(90deg,var(--blue),transparent);}
-.stat-card.end::before{background:linear-gradient(90deg,var(--gold),transparent);}
-.stat-card.sen::before{background:linear-gradient(90deg,var(--purple),transparent);}
-.stat-card.vit::before{background:linear-gradient(90deg,var(--orange),transparent);}
-.stat-name{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--text-dim);margin-bottom:5px;}
-.stat-val{font-family:'Orbitron',monospace;font-size:30px;font-weight:900;line-height:1;color:#fff;}
-.stat-bar-wrap{margin-top:7px;background:rgba(255,255,255,0.06);height:3px;}
-.stat-bar{height:100%;transition:width 1s ease;}
-.str .stat-bar{background:var(--red);}
-.agi .stat-bar{background:var(--green);}
-.int .stat-bar{background:var(--blue);}
-.end .stat-bar{background:var(--gold);}
-.sen .stat-bar{background:var(--purple);}
-.vit .stat-bar{background:var(--orange);}
-
-/* REVIEW */
-.review-card{background:var(--panel);border:1px solid var(--border);padding:16px;margin-bottom:12px;}
-.review-card h3{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--blue);margin-bottom:11px;}
-.review-textarea{width:100%;background:rgba(0,212,255,0.03);border:1px solid rgba(0,212,255,0.13);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px;resize:none;outline:none;line-height:1.6;}
-.review-textarea:focus{border-color:var(--blue);}
-.review-textarea::placeholder{color:var(--text-dim);}
-.system-btn{width:100%;background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(0,212,255,0.04));border:1px solid var(--blue);color:var(--blue);padding:12px;font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;cursor:pointer;transition:all 0.2s;margin-top:9px;}
-.system-btn:hover{background:rgba(0,212,255,0.14);}
-.ai-response{background:rgba(123,47,255,0.07);border:1px solid rgba(123,47,255,0.3);border-left:3px solid var(--purple);padding:13px;margin-top:11px;display:none;}
-.ai-response.show{display:block;}
-.ai-label{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:3px;color:var(--purple);margin-bottom:7px;}
-.ai-text{font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.7;color:var(--text);}
-
-/* PERFORMANCE REPORT */
-.perf-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:600;display:none;overflow-y:auto;padding:20px 16px 40px;}
-.perf-overlay.show{display:block;}
-.perf-modal{max-width:480px;margin:0 auto;}
-.perf-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
-.perf-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:900;color:var(--blue);letter-spacing:3px;}
-.perf-close{font-family:'Orbitron',monospace;font-size:9px;color:var(--text-dim);background:transparent;border:1px solid var(--border);padding:6px 14px;cursor:pointer;transition:all 0.2s;}
-.perf-close:hover{border-color:var(--red);color:var(--red);}
-.overall-rank{background:var(--panel);border:1px solid var(--border);padding:20px;margin-bottom:12px;text-align:center;position:relative;overflow:hidden;}
-.overall-rank::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--purple),var(--blue),transparent);}
-.rank-label{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:4px;color:var(--text-dim);margin-bottom:8px;}
-.rank-val{font-family:'Orbitron',monospace;font-size:52px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.rank-name{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:3px;color:#fff;margin-top:4px;}
-.rank-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:6px;}
-.streaks-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
-.streak-card{background:var(--panel);border:1px solid var(--border);padding:12px;text-align:center;position:relative;overflow:hidden;}
-.streak-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.streak-card.personal::before{background:var(--personal);}
-.streak-card.fitness::before{background:var(--fitness);}
-.streak-card.academic::before{background:var(--academic);}
-.streak-domain{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:2px;color:var(--text-dim);margin-bottom:5px;}
-.streak-num{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;line-height:1;}
-.streak-card.personal .streak-num{color:var(--personal);}
-.streak-card.fitness .streak-num{color:var(--fitness);}
-.streak-card.academic .streak-num{color:var(--academic);}
-.streak-unit{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);margin-top:3px;}
-.radar-wrap{background:var(--panel);border:1px solid var(--border);padding:16px;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;}
-.radar-title{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;color:var(--blue);margin-bottom:14px;}
-.domain-ranks{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px;}
-.domain-rank-card{background:var(--panel);border:1px solid var(--border);padding:14px 16px;position:relative;overflow:hidden;}
-.domain-rank-card.personal{border-left:3px solid var(--personal);}
-.domain-rank-card.fitness{border-left:3px solid var(--fitness);}
-.domain-rank-card.academic{border-left:3px solid var(--academic);}
-.dr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-.dr-domain{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);}
-.dr-rank{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;}
-.domain-rank-card.personal .dr-rank{color:var(--personal);}
-.domain-rank-card.fitness .dr-rank{color:var(--fitness);}
-.domain-rank-card.academic .dr-rank{color:var(--academic);}
-.dr-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;}
-.dr-metric{text-align:center;}
-.dr-metric-label{font-family:'Orbitron',monospace;font-size:7px;letter-spacing:1px;color:var(--text-dim);margin-bottom:3px;}
-.dr-metric-val{font-family:'Share Tech Mono',monospace;font-size:14px;color:#fff;}
-.dr-bar-row{margin-top:8px;}
-.dr-bar-label{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);margin-bottom:3px;}
-.dr-bar-wrap{background:rgba(255,255,255,0.06);height:4px;margin-bottom:4px;}
-.dr-bar{height:100%;transition:width 1.2s ease;}
-.domain-rank-card.personal .dr-bar{background:var(--personal);}
-.domain-rank-card.fitness .dr-bar{background:var(--fitness);}
-.domain-rank-card.academic .dr-bar{background:var(--academic);}
-.week-history{background:var(--panel);border:1px solid var(--border);padding:14px 16px;margin-bottom:12px;}
-.week-history h3{font-family:'Orbitron',monospace;font-size:10px;letter-spacing:2px;color:var(--blue);margin-bottom:12px;}
-.week-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.week-day{font-family:'Orbitron',monospace;font-size:8px;color:var(--text-dim);width:28px;flex-shrink:0;}
-.week-bars{display:flex;gap:4px;flex:1;}
-.week-bar-wrap{flex:1;background:rgba(255,255,255,0.05);height:18px;position:relative;overflow:hidden;}
-.week-bar-fill{position:absolute;bottom:0;left:0;right:0;transition:height 0.8s ease;}
-.week-bar-wrap.personal .week-bar-fill{background:var(--personal);}
-.week-bar-wrap.fitness .week-bar-fill{background:var(--fitness);}
-.week-bar-wrap.academic .week-bar-fill{background:var(--academic);}
-.week-pct{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);width:32px;text-align:right;}
-.week-legend{display:flex;gap:14px;margin-top:10px;}
-.wl-item{display:flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);}
-.wl-dot{width:8px;height:8px;border-radius:50%;}
-.ai-analysis{background:rgba(123,47,255,0.07);border:1px solid rgba(123,47,255,0.3);border-left:3px solid var(--purple);padding:16px;margin-bottom:12px;}
-.ai-analysis-title{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--purple);margin-bottom:10px;}
-.ai-analysis-text{font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.8;color:var(--text);}
-.suggestion-block{margin-top:12px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.12);padding:12px;}
-.suggestion-title{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:3px;color:var(--blue);margin-bottom:8px;}
-.suggestion-item{display:flex;gap:8px;margin-bottom:6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);}
-.suggestion-arrow{color:var(--blue);flex-shrink:0;}
-
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:700;display:none;align-items:center;justify-content:center;padding:20px;}
-.modal-overlay.show{display:flex;}
-.modal{background:var(--bg2);border:1px solid var(--blue);border-top:3px solid var(--blue);width:100%;max-width:440px;padding:22px;box-shadow:0 0 40px var(--blue-glow);max-height:90vh;overflow-y:auto;}
-.modal h3{font-family:'Orbitron',monospace;font-size:12px;letter-spacing:3px;color:var(--blue);margin-bottom:14px;}
-.modal-label{font-family:'Orbitron',monospace;font-size:8px;letter-spacing:2px;color:var(--text-dim);margin-bottom:5px;margin-top:10px;}
-.modal input,.modal select{width:100%;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.2);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:500;padding:10px 12px;outline:none;transition:border-color 0.2s;}
-.modal input:focus,.modal select:focus{border-color:var(--blue);}
-.modal select option{background:var(--bg2);}
-.modal-btns{display:flex;gap:10px;margin-top:14px;}
-.btn-cancel{flex:1;background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--text-dim);padding:10px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;}
-.btn-confirm{flex:2;background:linear-gradient(135deg,rgba(0,212,255,0.18),rgba(0,212,255,0.06));border:1px solid var(--blue);color:var(--blue);padding:10px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;}
-.btn-confirm:hover{box-shadow:0 0 14px var(--blue-glow);}
-.purple-confirm{border-color:var(--purple)!important;color:var(--purple)!important;}
-.xp-rules{background:rgba(0,212,255,0.03);border:1px solid var(--border);padding:4px 14px;margin-bottom:12px;}
-.xp-rule{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,212,255,0.06);}
-.xp-rule:last-child{border-bottom:none;}
-.xp-rule-label{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text);}
-.xp-rule-val{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;}
-.settings-row{background:var(--panel);border:1px solid var(--border);padding:14px 16px;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;}
-.settings-row-label{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);}
-.settings-row-val{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--blue);margin-top:3px;}
-.settings-edit-btn{font-family:'Orbitron',monospace;font-size:8px;background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:5px 12px;cursor:pointer;transition:all 0.2s;}
-.settings-edit-btn:hover{border-color:var(--blue);color:var(--blue);}
-@keyframes levelUp{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
-.pulse{animation:levelUp 0.6s ease;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE SYSTEM</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;600;800;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-<div class="scanline"></div>
+  <div class="scanline"></div>
 
-<!-- ══ AUTH SCREEN ══ -->
-<div class="auth-screen" id="authScreen">
-  <div class="auth-box">
-    <div class="auth-logo">◈ SYSTEM INTERFACE</div>
-    <div class="auth-title">THE SYSTEM</div>
-    <div class="auth-sub">Identify yourself, Hunter.</div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login',this)">LOGIN</div>
-      <div class="auth-tab" onclick="switchAuthTab('register',this)">REGISTER</div>
-    </div>
-    <div id="loginForm">
-      <div class="auth-label">USERNAME</div>
-      <input class="auth-input" id="loginUser" type="text" placeholder="your_username" autocomplete="username">
-      <div class="auth-label">PASSWORD</div>
-      <input class="auth-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
-      <button class="auth-btn" onclick="login()">ENTER THE SYSTEM</button>
-    </div>
-    <div id="registerForm" style="display:none">
-      <div class="auth-label">HUNTER NAME (shown in app)</div>
-      <input class="auth-input" id="regHunter" type="text" placeholder="SUNG JIN-WOO">
-      <div class="auth-label">USERNAME</div>
-      <input class="auth-input" id="regUser" type="text" placeholder="your_username" autocomplete="username">
-      <div class="auth-label">PASSWORD (min 6 chars)</div>
-      <input class="auth-input" id="regPass" type="password" placeholder="••••••••" autocomplete="new-password">
-      <button class="auth-btn" onclick="register()">CREATE HUNTER</button>
-    </div>
-    <div class="auth-error" id="authError"></div>
-  </div>
-</div>
-
-<!-- ══ MAIN APP ══ -->
-<div class="system-alert normal" id="alert">
-  <div class="alert-header" id="alertHeader">◈ SYSTEM NOTIFICATION</div>
-  <div class="alert-msg" id="alertMsg"></div>
-  <div class="alert-sub" id="alertSub"></div>
-</div>
-<div class="xp-popup" id="xpPopup"></div>
-
-<div class="app" id="mainApp" style="display:none">
-  <!-- Sync bar -->
-  <div class="sync-bar">
-    <div class="sync-status">
-      <div class="sync-dot ok" id="syncDot"></div>
-      <span id="syncText" style="color:var(--text-dim)">Synced</span>
-    </div>
-    <button class="logout-btn" onclick="logout()">LOGOUT</button>
-  </div>
-
-  <div class="header">
-    <div class="system-label">◈ SYSTEM INTERFACE v3.0</div>
-    <div class="hunter-name" id="hunterName">HUNTER</div>
-    <div class="rank-badge">E-RANK → RISING</div>
-    <div class="level-panel">
-      <div class="level-row">
-        <div><div class="level-label">LEVEL</div><div class="level-num" id="levelNum">1</div></div>
-        <div class="xp-info"><div class="xp-val" id="xpVal">0 / 1000 XP</div><div class="xp-label">EXPERIENCE</div></div>
+  <!-- ══ AUTH SCREEN ══ -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-box">
+      <div class="auth-logo">◈ SYSTEM INTERFACE</div>
+      <div class="auth-title">THE SYSTEM</div>
+      <div class="auth-sub">Identify yourself, Hunter.</div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('login',this)">LOGIN</div>
+        <div class="auth-tab" onclick="switchAuthTab('register',this)">REGISTER</div>
       </div>
-      <div class="xp-bar-wrap"><div class="xp-bar" id="xpBar" style="width:0%"></div></div>
-    </div>
-    <div class="cutoff-strip">
-      <div><div class="cutoff-label">DAILY CUTOFF</div><div class="cutoff-time" id="cutoffDisplay">22:00</div></div>
-      <button class="cutoff-edit" onclick="openCutoffModal()">EDIT</button>
-    </div>
-    <div class="live-clock">
-      <div class="clock-now" id="clockNow">--:--:--</div>
-      <div class="time-status ok" id="timeStatus">ON TIME</div>
-    </div>
-    <button class="perf-btn" onclick="openPerfReport()">◈ PERFORMANCE REPORT ↗</button>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('quests',this)">QUESTS</div>
-    <div class="tab" onclick="switchTab('stats',this)">STATS</div>
-    <div class="tab" onclick="switchTab('review',this)">REVIEW</div>
-    <div class="tab" onclick="switchTab('rules',this)">RULES</div>
-  </div>
-
-  <div class="section active" id="tab-quests">
-    <div class="penalty-banner" id="penaltyBanner">
-      <div class="penalty-title">⚠ PENALTY ZONE</div>
-      <div class="penalty-desc" id="penaltyDesc"></div>
-    </div>
-    <div class="domain-filter">
-      <button class="df-btn all active" onclick="filterDomain('all',this)">ALL</button>
-      <button class="df-btn personal" onclick="filterDomain('personal',this)">PERSONAL</button>
-      <button class="df-btn fitness" onclick="filterDomain('fitness',this)">FITNESS</button>
-      <button class="df-btn academic" onclick="filterDomain('academic',this)">ACADEMIC</button>
-    </div>
-    <div class="section-title">DAILY QUESTS</div>
-    <div id="questList"></div>
-    <button class="add-quest-btn" onclick="openAddQuest()">+ ADD NEW QUEST</button>
-  </div>
-
-  <div class="section" id="tab-stats">
-    <div class="stat-points-banner">
-      <div><div class="points-label">STAT POINTS AVAILABLE</div></div>
-      <div class="points-val" id="statPoints">0</div>
-    </div>
-    <div class="section-title">ATTRIBUTES</div>
-    <div class="stats-grid" id="statsGrid"></div>
-  </div>
-
-  <div class="section" id="tab-review">
-    <div class="section-title">DAILY REVIEW</div>
-    <div class="review-card">
-      <h3>◈ END OF DAY REPORT</h3>
-      <textarea class="review-textarea" id="reviewText" placeholder="Hunter, reflect on today...&#10;• What quests did you complete?&#10;• What held you back?&#10;• What will you change tomorrow?" rows="6"></textarea>
-      <button class="system-btn" onclick="submitReview()">SUBMIT REPORT TO SYSTEM</button>
-      <div class="ai-response" id="aiResponse"><div class="ai-label">◈ SYSTEM ANALYSIS</div><div class="ai-text" id="aiText"></div></div>
-    </div>
-    <div class="section-title">WEEKLY EVALUATION</div>
-    <div class="review-card">
-      <h3>◈ WEEKLY BOSS ASSESSMENT</h3>
-      <textarea class="review-textarea" id="weeklyText" placeholder="Evaluate your week...&#10;• Which domain performed best?&#10;• Where did you fall short?" rows="5"></textarea>
-      <button class="system-btn" onclick="submitWeekly()">COMPLETE WEEKLY EVALUATION</button>
+      <div id="loginForm">
+        <div class="auth-label">USERNAME</div>
+        <input class="auth-input" id="loginUser" type="text" placeholder="your_username" autocomplete="username">
+        <div class="auth-label">PASSWORD</div>
+        <input class="auth-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button class="auth-btn" onclick="login()">ENTER THE SYSTEM</button>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="auth-label">HUNTER NAME (shown in app)</div>
+        <input class="auth-input" id="regHunter" type="text" placeholder="SUNG JIN-WOO">
+        <div class="auth-label">USERNAME</div>
+        <input class="auth-input" id="regUser" type="text" placeholder="your_username" autocomplete="username">
+        <div class="auth-label">PASSWORD (min 6 chars)</div>
+        <input class="auth-input" id="regPass" type="password" placeholder="••••••••" autocomplete="new-password">
+        <button class="auth-btn" onclick="register()">CREATE HUNTER</button>
+      </div>
+      <div class="auth-error" id="authError"></div>
     </div>
   </div>
 
-  <div class="section" id="tab-rules">
-    <div class="section-title">XP TIME RULES</div>
-    <div class="xp-rules">
-      <div class="xp-rule"><div class="xp-rule-label">⚡ Early (1hr+ before cutoff)</div><div class="xp-rule-val" style="color:var(--gold)">+25% BONUS</div></div>
-      <div class="xp-rule"><div class="xp-rule-label">✓ On time</div><div class="xp-rule-val" style="color:var(--green)">100% XP</div></div>
-      <div class="xp-rule"><div class="xp-rule-label">⚠ After cutoff</div><div class="xp-rule-val" style="color:var(--orange)">50% XP</div></div>
-      <div class="xp-rule"><div class="xp-rule-label">☠ Missed</div><div class="xp-rule-val" style="color:var(--red)">PENALTY ZONE</div></div>
-    </div>
-    <div class="section-title">SETTINGS</div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">DAILY CUTOFF TIME</div><div class="settings-row-val" id="cutoffSettingVal">22:00</div></div>
-      <button class="settings-edit-btn" onclick="openCutoffModal()">CHANGE</button>
-    </div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">HUNTER NAME</div><div class="settings-row-val" id="nameSettingVal">HUNTER</div></div>
-      <button class="settings-edit-btn" onclick="changeName()">CHANGE</button>
-    </div>
+  <!-- ══ MAIN APP ══ -->
+  <div class="system-alert normal" id="alert">
+    <div class="alert-header" id="alertHeader">◈ SYSTEM NOTIFICATION</div>
+    <div class="alert-msg" id="alertMsg"></div>
+    <div class="alert-sub" id="alertSub"></div>
   </div>
-</div>
+  <div class="xp-popup" id="xpPopup"></div>
 
-<!-- PERFORMANCE REPORT -->
-<div class="perf-overlay" id="perfOverlay">
-  <div class="perf-modal">
-    <div class="perf-header">
-      <div class="perf-title">◈ PERFORMANCE REPORT</div>
-      <button class="perf-close" onclick="closePerfReport()">✕ CLOSE</button>
+  <div class="app" id="mainApp" style="display:none">
+    <!-- Sync bar -->
+    <div class="sync-bar">
+      <div class="sync-status">
+        <div class="sync-dot ok" id="syncDot"></div>
+        <span id="syncText" style="color:var(--text-dim)">Synced</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
-    <div class="overall-rank">
-      <div class="rank-label">OVERALL HUNTER RANK</div>
-      <div class="rank-val" id="overallRankVal">E</div>
-      <div class="rank-name" id="overallRankName">E-RANK HUNTER</div>
-      <div class="rank-sub" id="overallRankSub"></div>
+
+    <div class="header">
+      <div class="system-label">◈ SYSTEM INTERFACE v3.0</div>
+      <div class="hunter-name" id="hunterName">HUNTER</div>
+      <div class="rank-badge">E-RANK → RISING</div>
+      <div class="level-panel">
+        <div class="level-row">
+          <div>
+            <div class="level-label">LEVEL</div>
+            <div class="level-num" id="levelNum">1</div>
+          </div>
+          <div class="xp-info">
+            <div class="xp-val" id="xpVal">0 / 1000 XP</div>
+            <div class="xp-label">EXPERIENCE</div>
+          </div>
+        </div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar" id="xpBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="cutoff-strip">
+        <div>
+          <div class="cutoff-label">DAILY CUTOFF</div>
+          <div class="cutoff-time" id="cutoffDisplay">22:00</div>
+        </div>
+        <button class="cutoff-edit" onclick="openCutoffModal()">EDIT</button>
+      </div>
+      <div class="live-clock">
+        <div class="clock-now" id="clockNow">--:--:--</div>
+        <div class="time-status ok" id="timeStatus">ON TIME</div>
+      </div>
+      <button class="perf-btn" onclick="openPerfReport()">◈ PERFORMANCE REPORT ↗</button>
     </div>
-    <div class="streaks-row">
-      <div class="streak-card personal"><div class="streak-domain">PERSONAL</div><div class="streak-num" id="streakPersonal">0</div><div class="streak-unit">day streak</div></div>
-      <div class="streak-card fitness"><div class="streak-domain">FITNESS</div><div class="streak-num" id="streakFitness">0</div><div class="streak-unit">day streak</div></div>
-      <div class="streak-card academic"><div class="streak-domain">ACADEMIC</div><div class="streak-num" id="streakAcademic">0</div><div class="streak-unit">day streak</div></div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('quests',this)">QUESTS</div>
+      <div class="tab" onclick="switchTab('stats',this)">STATS</div>
+      <div class="tab" onclick="switchTab('review',this)">REVIEW</div>
+      <div class="tab" onclick="switchTab('rules',this)">RULES</div>
     </div>
-    <div class="radar-wrap">
-      <div class="radar-title">DOMAIN PERFORMANCE RADAR</div>
-      <canvas id="radarCanvas" width="280" height="260"></canvas>
+
+    <div class="section active" id="tab-quests">
+      <div class="penalty-banner" id="penaltyBanner">
+        <div class="penalty-title">⚠ PENALTY ZONE</div>
+        <div class="penalty-desc" id="penaltyDesc"></div>
+      </div>
+      <div class="domain-filter">
+        <button class="df-btn all active" onclick="filterDomain('all',this)">ALL</button>
+        <button class="df-btn personal" onclick="filterDomain('personal',this)">PERSONAL</button>
+        <button class="df-btn fitness" onclick="filterDomain('fitness',this)">FITNESS</button>
+        <button class="df-btn academic" onclick="filterDomain('academic',this)">ACADEMIC</button>
+      </div>
+      <div class="section-title">DAILY QUESTS</div>
+      <div id="questList"></div>
+      <button class="add-quest-btn" onclick="openAddQuest()">+ ADD NEW QUEST</button>
     </div>
-    <div class="domain-ranks" id="domainRanks"></div>
-    <div class="week-history">
-      <h3>◈ 7-DAY COMPLETION HISTORY</h3>
-      <div id="weekHistory"></div>
-      <div class="week-legend">
-        <div class="wl-item"><div class="wl-dot" style="background:var(--personal)"></div>Personal</div>
-        <div class="wl-item"><div class="wl-dot" style="background:var(--fitness)"></div>Fitness</div>
-        <div class="wl-item"><div class="wl-dot" style="background:var(--academic)"></div>Academic</div>
+
+    <div class="section" id="tab-stats">
+      <div class="stat-points-banner">
+        <div>
+          <div class="points-label">STAT POINTS AVAILABLE</div>
+        </div>
+        <div class="points-val" id="statPoints">0</div>
+      </div>
+      <div class="section-title">ATTRIBUTES</div>
+      <div class="stats-grid" id="statsGrid"></div>
+    </div>
+
+    <div class="section" id="tab-review">
+      <div class="section-title">DAILY REVIEW</div>
+      <div class="review-card">
+        <h3>◈ END OF DAY REPORT</h3>
+        <textarea class="review-textarea" id="reviewText"
+          placeholder="Hunter, reflect on today...&#10;• What quests did you complete?&#10;• What held you back?&#10;• What will you change tomorrow?"
+          rows="6"></textarea>
+        <button class="system-btn" onclick="submitReview()">SUBMIT REPORT TO SYSTEM</button>
+        <div class="ai-response" id="aiResponse">
+          <div class="ai-label">◈ SYSTEM ANALYSIS</div>
+          <div class="ai-text" id="aiText"></div>
+        </div>
+      </div>
+      <div class="section-title">WEEKLY EVALUATION</div>
+      <div class="review-card">
+        <h3>◈ WEEKLY BOSS ASSESSMENT</h3>
+        <textarea class="review-textarea" id="weeklyText"
+          placeholder="Evaluate your week...&#10;• Which domain performed best?&#10;• Where did you fall short?"
+          rows="5"></textarea>
+        <button class="system-btn" onclick="submitWeekly()">COMPLETE WEEKLY EVALUATION</button>
       </div>
     </div>
-    <div class="ai-analysis">
-      <div class="ai-analysis-title">◈ SYSTEM PERSONALIZED ANALYSIS</div>
-      <div class="ai-analysis-text" id="perfAiText"></div>
-      <div class="suggestion-block">
-        <div class="suggestion-title">SYSTEM RECOMMENDATIONS</div>
-        <div id="suggestionList"></div>
+
+    <div class="section" id="tab-rules">
+      <div class="section-title">XP TIME RULES</div>
+      <div class="xp-rules">
+        <div class="xp-rule">
+          <div class="xp-rule-label">⚡ Early (1hr+ before cutoff)</div>
+          <div class="xp-rule-val" style="color:var(--gold)">+25% BONUS</div>
+        </div>
+        <div class="xp-rule">
+          <div class="xp-rule-label">✓ On time</div>
+          <div class="xp-rule-val" style="color:var(--green)">100% XP</div>
+        </div>
+        <div class="xp-rule">
+          <div class="xp-rule-label">⚠ After cutoff</div>
+          <div class="xp-rule-val" style="color:var(--orange)">50% XP</div>
+        </div>
+        <div class="xp-rule">
+          <div class="xp-rule-label">☠ Missed</div>
+          <div class="xp-rule-val" style="color:var(--red)">PENALTY ZONE</div>
+        </div>
+      </div>
+      <div class="section-title">SETTINGS</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">DAILY CUTOFF TIME</div>
+          <div class="settings-row-val" id="cutoffSettingVal">22:00</div>
+        </div>
+        <button class="settings-edit-btn" onclick="openCutoffModal()">CHANGE</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">HUNTER NAME</div>
+          <div class="settings-row-val" id="nameSettingVal">HUNTER</div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">WHATSAPP NUMBER</div>
+            <div class="settings-row-val" id="phoneSettingVal">Not set</div>
+          </div>
+          <button class="settings-edit-btn" onclick="openPhoneModal()">SET</button>
+        </div>
+        <button class="settings-edit-btn" onclick="changeName()">CHANGE</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Quest Modal -->
-<div class="modal-overlay" id="questModal">
+  <!-- PERFORMANCE REPORT -->
+  <div class="perf-overlay" id="perfOverlay">
+    <div class="perf-modal">
+      <div class="perf-header">
+        <div class="perf-title">◈ PERFORMANCE REPORT</div>
+        <button class="perf-close" onclick="closePerfReport()">✕ CLOSE</button>
+      </div>
+      <div class="overall-rank">
+        <div class="rank-label">OVERALL HUNTER RANK</div>
+        <div class="rank-val" id="overallRankVal">E</div>
+        <div class="rank-name" id="overallRankName">E-RANK HUNTER</div>
+        <div class="rank-sub" id="overallRankSub"></div>
+      </div>
+      <div class="streaks-row">
+        <div class="streak-card personal">
+          <div class="streak-domain">PERSONAL</div>
+          <div class="streak-num" id="streakPersonal">0</div>
+          <div class="streak-unit">day streak</div>
+        </div>
+        <div class="streak-card fitness">
+          <div class="streak-domain">FITNESS</div>
+          <div class="streak-num" id="streakFitness">0</div>
+          <div class="streak-unit">day streak</div>
+        </div>
+        <div class="streak-card academic">
+          <div class="streak-domain">ACADEMIC</div>
+          <div class="streak-num" id="streakAcademic">0</div>
+          <div class="streak-unit">day streak</div>
+        </div>
+      </div>
+      <div class="radar-wrap">
+        <div class="radar-title">DOMAIN PERFORMANCE RADAR</div>
+        <canvas id="radarCanvas" width="280" height="260"></canvas>
+      </div>
+      <div class="domain-ranks" id="domainRanks"></div>
+      <div class="week-history">
+        <h3>◈ 7-DAY COMPLETION HISTORY</h3>
+        <div id="weekHistory"></div>
+        <div class="week-legend">
+          <div class="wl-item">
+            <div class="wl-dot" style="background:var(--personal)"></div>Personal
+          </div>
+          <div class="wl-item">
+            <div class="wl-dot" style="background:var(--fitness)"></div>Fitness
+          </div>
+          <div class="wl-item">
+            <div class="wl-dot" style="background:var(--academic)"></div>Academic
+          </div>
+        </div>
+      </div>
+      <div class="ai-analysis">
+        <div class="ai-analysis-title">◈ SYSTEM PERSONALIZED ANALYSIS</div>
+        <div class="ai-analysis-text" id="perfAiText"></div>
+        <div class="suggestion-block">
+          <div class="suggestion-title">SYSTEM RECOMMENDATIONS</div>
+          <div id="suggestionList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quest Modal -->
+  <div class="modal-overlay" id="questModal">
+    <div class="modal">
+      <h3>◈ NEW QUEST REGISTRATION</h3>
+      <div class="modal-label">QUEST NAME</div>
+      <input type="text" id="questNameInput" placeholder="Describe your quest..." maxlength="60">
+      <div class="modal-label">DOMAIN</div>
+      <select id="questDomainInput">
+        <option value="personal">🔵 PERSONAL</option>
+        <option value="fitness">🟢 FITNESS</option>
+        <option value="academic">🟣 ACADEMIC</option>
+      </select>
+      <div class="modal-label">LINKED STAT</div>
+      <select id="questStatInput">
+        <option value="STR">STRENGTH</option>
+        <option value="AGI">AGILITY</option>
+        <option value="INT">INTELLIGENCE</option>
+        <option value="END">ENDURANCE</option>
+        <option value="SEN">SENSE</option>
+        <option value="VIT">VITALITY</option>
+      </select>
+      <div class="modal-label">DIFFICULTY</div>
+      <select id="questDiffInput">
+        <option value="easy">EASY — 50 XP</option>
+        <option value="medium">MEDIUM — 100 XP</option>
+        <option value="hard">HARD — 200 XP</option>
+      </select>
+      <div class="modal-label">REMINDER TIME (optional)</div>
+      <input type="time" id="questReminderInput">
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('questModal')">CANCEL</button>
+        <button class="btn-confirm" onclick="addQuest()">REGISTER</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cutoff Modal -->
+  <div class="modal-overlay" id="cutoffModal">
+    <div class="modal" style="border-top-color:var(--purple);border-color:rgba(123,47,255,0.35);">
+      <h3 style="color:var(--purple);">◈ SET DAILY CUTOFF</h3>
+      <div class="modal-label">TIME (24H)</div>
+      <input type="time" id="cutoffInput" value="22:00">
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('cutoffModal')">CANCEL</button>
+        <button class="btn-confirm purple-confirm" onclick="saveCutoff()">SAVE</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="phoneModal">
   <div class="modal">
-    <h3>◈ NEW QUEST REGISTRATION</h3>
-    <div class="modal-label">QUEST NAME</div>
-    <input type="text" id="questNameInput" placeholder="Describe your quest..." maxlength="60">
-    <div class="modal-label">DOMAIN</div>
-    <select id="questDomainInput">
-      <option value="personal">🔵 PERSONAL</option>
-      <option value="fitness">🟢 FITNESS</option>
-      <option value="academic">🟣 ACADEMIC</option>
-    </select>
-    <div class="modal-label">LINKED STAT</div>
-    <select id="questStatInput">
-      <option value="STR">STRENGTH</option><option value="AGI">AGILITY</option>
-      <option value="INT">INTELLIGENCE</option><option value="END">ENDURANCE</option>
-      <option value="SEN">SENSE</option><option value="VIT">VITALITY</option>
-    </select>
-    <div class="modal-label">DIFFICULTY</div>
-    <select id="questDiffInput">
-      <option value="easy">EASY — 50 XP</option>
-      <option value="medium">MEDIUM — 100 XP</option>
-      <option value="hard">HARD — 200 XP</option>
-    </select>
+    <h3>◈ WHATSAPP NOTIFICATIONS</h3>
+    <div class="modal-label">YOUR PHONE NUMBER</div>
+    <input type="tel" id="phoneInput" placeholder="+91XXXXXXXXXX">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.8;">
+      Include country code.<br>
+      e.g. India → +919876543210<br>
+      You must message the Twilio sandbox first.
+    </div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('questModal')">CANCEL</button>
-      <button class="btn-confirm" onclick="addQuest()">REGISTER</button>
+      <button class="btn-cancel" onclick="closeModal('phoneModal')">CANCEL</button>
+      <button class="btn-confirm" onclick="savePhone()">SAVE</button>
     </div>
   </div>
 </div>
 
-<!-- Cutoff Modal -->
-<div class="modal-overlay" id="cutoffModal">
-  <div class="modal" style="border-top-color:var(--purple);border-color:rgba(123,47,255,0.35);">
-    <h3 style="color:var(--purple);">◈ SET DAILY CUTOFF</h3>
-    <div class="modal-label">TIME (24H)</div>
-    <input type="time" id="cutoffInput" value="22:00">
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('cutoffModal')">CANCEL</button>
-      <button class="btn-confirm purple-confirm" onclick="saveCutoff()">SAVE</button>
-    </div>
-  </div>
-</div>
 
-<script>
-// ══════════════════════════════════════
-// CONFIG — change this to your backend URL after deploying
-// ══════════════════════════════════════
-const API = 'https://solo-system-backend-production.up.railway.app/api';
-// During local testing use: const API = 'http://localhost:5000/api';
-
-// ══════════════════════════════════════
-// AUTH STATE
-// ══════════════════════════════════════
-let token = localStorage.getItem('sl_token') || '';
-let S = null; // loaded from server
-let activeDomainFilter = 'all';
-let saveTimer = null;
-
-function getHeaders(){
-  return {'Content-Type':'application/json','Authorization':'Bearer '+token};
-}
-
-// ══════════════════════════════════════
-// AUTH
-// ══════════════════════════════════════
-function switchAuthTab(tab, el){
-  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
-  document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
-  document.getElementById('authError').textContent = '';
-}
-
-async function login(){
-  const username = document.getElementById('loginUser').value.trim();
-  const password = document.getElementById('loginPass').value;
-  if(!username||!password) return setAuthError('Fill in all fields.');
-  try{
-    const res = await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
-    const data = await res.json();
-    if(!res.ok) return setAuthError(data.error||'Login failed.');
-    token = data.token;
-    localStorage.setItem('sl_token', token);
-    await loadData();
-  } catch(e){ setAuthError('Cannot reach server. Check your connection.'); }
-}
-
-async function register(){
-  const hunterName = document.getElementById('regHunter').value.trim();
-  const username = document.getElementById('regUser').value.trim();
-  const password = document.getElementById('regPass').value;
-  if(!username||!password) return setAuthError('Fill in all fields.');
-  try{
-    const res = await fetch(`${API}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,hunterName})});
-    const data = await res.json();
-    if(!res.ok) return setAuthError(data.error||'Registration failed.');
-    token = data.token;
-    localStorage.setItem('sl_token', token);
-    await loadData();
-  } catch(e){ setAuthError('Cannot reach server. Check your connection.'); }
-}
-
-function logout(){
-  token = '';
-  S = null;
-  localStorage.removeItem('sl_token');
-  document.getElementById('mainApp').style.display = 'none';
-  document.getElementById('authScreen').classList.remove('hidden');
-}
-
-function setAuthError(msg){ document.getElementById('authError').textContent = msg; }
-
-// ══════════════════════════════════════
-// DATA SYNC
-// ══════════════════════════════════════
-async function loadData(){
-  try{
-    setSyncStatus('saving','Loading...');
-    const res = await fetch(`${API}/data`,{headers:getHeaders()});
-    if(res.status===401){logout();return;}
-    S = await res.json();
-    if(!S.history||!S.history.length) S.history = generateDefaultHistory();
-    if(!S.streaks) S.streaks = {personal:0,fitness:0,academic:0};
-    showApp();
-    setSyncStatus('ok','Synced');
-  } catch(e){
-    setSyncStatus('error','Offline');
-    showAlert('warning','Sync Failed','Could not reach server. Changes may not save.');
-  }
-}
-
-function scheduleSave(){
-  clearTimeout(saveTimer);
-  setSyncStatus('saving','Saving...');
-  saveTimer = setTimeout(pushData, 1500);
-}
-
-async function pushData(){
-  if(!S||!token) return;
-  try{
-    const res = await fetch(`${API}/data`,{method:'POST',headers:getHeaders(),body:JSON.stringify(S)});
-    if(res.ok){ setSyncStatus('ok','Synced'); }
-    else setSyncStatus('error','Save failed');
-  } catch(e){ setSyncStatus('error','Offline'); }
-}
-
-function setSyncStatus(state, text){
-  const dot = document.getElementById('syncDot');
-  const txt = document.getElementById('syncText');
-  dot.className = 'sync-dot '+state;
-  txt.textContent = text;
-}
-
-function generateDefaultHistory(){
-  const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
-  return days.map(d=>({day:d,personal:0,fitness:0,academic:0}));
-}
-
-// ══════════════════════════════════════
-// SHOW APP
-// ══════════════════════════════════════
-function showApp(){
-  document.getElementById('authScreen').classList.add('hidden');
-  document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('hunterName').textContent = S.hunterName||'HUNTER';
-  document.getElementById('nameSettingVal').textContent = S.hunterName||'HUNTER';
-  document.getElementById('cutoffDisplay').textContent = S.cutoff||'22:00';
-  document.getElementById('cutoffSettingVal').textContent = S.cutoff||'22:00';
-  document.getElementById('levelNum').textContent = S.level||1;
-  const pct = Math.round(((S.xp||0)/(S.xpMax||1000))*100);
-  document.getElementById('xpVal').textContent = `${S.xp||0} / ${S.xpMax||1000} XP`;
-  document.getElementById('xpBar').style.width = pct+'%';
-  checkPenalty();
-  renderQuests();
-  renderStats();
-  setTimeout(()=>showAlert('normal','System Online',`Welcome back, ${S.hunterName||'Hunter'}.`), 600);
-}
-
-// ══════════════════════════════════════
-// TIME
-// ══════════════════════════════════════
-function cutoffMins(){const[h,m]=(S.cutoff||'22:00').split(':').map(Number);return h*60+m;}
-function nowMins(){const n=new Date();return n.getHours()*60+n.getMinutes();}
-function minsLeft(){return cutoffMins()-nowMins();}
-function getMultiplier(){
-  const m=minsLeft();
-  if(m>=60)return{mult:1.25,color:'var(--gold)'};
-  if(m>=0)return{mult:1.0,color:'var(--green)'};
-  return{mult:0.5,color:'var(--orange)'};
-}
-
-let reminderFired = false;
-function updateClock(){
-  if(!S) return;
-  const n=new Date(),pad=x=>String(x).padStart(2,'0');
-  document.getElementById('clockNow').textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
-  const m=minsLeft(),s=document.getElementById('timeStatus');
-  if(m>60){s.className='time-status ok';s.textContent='ON TIME';}
-  else if(m>0){s.className='time-status warning';s.textContent='CUTOFF SOON';}
-  else{s.className='time-status late';s.textContent='PAST CUTOFF';}
-  if(m<=15&&m>14&&!reminderFired){reminderFired=true;showAlert('warning','⏰ 15 MIN LEFT','Complete quests now or XP will be halved!');}
-  if(m>15)reminderFired=false;
-}
-
-// ══════════════════════════════════════
-// RENDER QUESTS
-// ══════════════════════════════════════
-function renderQuests(){
-  if(!S) return;
-  const el=document.getElementById('questList');el.innerHTML='';
-  const mins=minsLeft();
-  const filtered=(S.quests||[]).filter(q=>activeDomainFilter==='all'||q.domain===activeDomainFilter);
-  if(!filtered.length){el.innerHTML=`<div style="text-align:center;padding:30px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);">No quests here yet.<br>Add one below.</div>`;return;}
-  filtered.forEach(q=>{
-    const div=document.createElement('div');
-    div.className='quest-card domain-'+q.domain+(q.done?' completed':'')+(q.isPenalty?' penalty-quest':'');
-    if(!q.done)div.onclick=()=>completeQuest(q.id);
-    const earlyXp=Math.round(q.baseXp*1.25),ontXp=q.baseXp,lateXp=Math.round(q.baseXp*0.5);
-    const nowXp=Math.round(q.baseXp*getMultiplier().mult);
-    let timer='';
-    if(!q.done){
-      if(mins>60)timer=`<div class="quest-timer ok">⏱ ${Math.floor(mins/60)}h ${mins%60}m to cutoff</div>`;
-      else if(mins>0)timer=`<div class="quest-timer soon">⚠ ${mins}m left!</div>`;
-      else timer=`<div class="quest-timer overdue">☠ PAST CUTOFF — 50% XP</div>`;
-    }
-    let badge='';
-    if(q.done){if(q.mult>1)badge=`<div class="done-badge early">⚡ EARLY</div>`;else if(q.mult===1)badge=`<div class="done-badge full">✓ DONE</div>`;else badge=`<div class="done-badge late">⚠ LATE</div>`;}
-    div.innerHTML=`
-      <div class="domain-pill ${q.isPenalty?'penalty':q.domain}">${q.isPenalty?'☠ PENALTY':q.domain.toUpperCase()}</div>
-      <div class="quest-name">${q.name}</div>
-      <div class="quest-meta">
-        <span class="quest-xp">${q.done?`+${Math.round(q.baseXp*(q.mult||1))} XP`:`+${nowXp} XP now`}</span>
-        <span class="quest-stat">↑ ${q.stat}</span>
-        <span class="quest-diff ${q.diff}">${q.diff.toUpperCase()}</span>
-      </div>
-      ${!q.done?`<div class="xp-preview"><span class="xp-tag early-tag">⚡${earlyXp}</span><span class="xp-tag ontime-tag">✓${ontXp}</span><span class="xp-tag late-tag">⚠${lateXp}</span></div>`:''}
-      ${timer}${badge}`;
-    el.appendChild(div);
-  });
-}
-
-function filterDomain(domain,btn){
-  activeDomainFilter=domain;
-  document.querySelectorAll('.df-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');renderQuests();
-}
-
-// ══════════════════════════════════════
-// COMPLETE QUEST
-// ══════════════════════════════════════
-function completeQuest(id){
-  const q=(S.quests||[]).find(x=>x.id===id);
-  if(!q||q.done)return;
-  const{mult,color}=getMultiplier();
-  const earned=Math.round(q.baseXp*mult);
-  q.done=true;q.mult=mult;
-  S.stats[q.stat].val=Math.min(100,S.stats[q.stat].val+2);
-  if(!S.streaks)S.streaks={personal:0,fitness:0,academic:0};
-  S.streaks[q.domain]=(S.streaks[q.domain]||0)+1;
-  addXP(earned,color);
-  const t=mult>1?'success':mult===1?'normal':'warning';
-  const msgs={success:['⚡ Early Bird!',`+${earned} XP (+25%) — ${q.stat} up!`],normal:['Quest Complete!',`+${earned} XP — ${q.stat} up!`],warning:['Quest Done (Late)',`+${earned} XP — 50% late penalty.`]};
-  showAlert(t,...msgs[t]);
-  renderQuests();renderStats();scheduleSave();
-}
-
-// ══════════════════════════════════════
-// XP + LEVEL
-// ══════════════════════════════════════
-function addXP(amount,color='var(--gold)'){
-  showPopup('+'+amount+' XP',color);
-  S.xp=(S.xp||0)+amount;
-  while(S.xp>=(S.xpMax||1000)){
-    S.xp-=S.xpMax;S.level=(S.level||1)+1;
-    S.xpMax=Math.floor(S.xpMax*1.3);S.sp=(S.sp||0)+5;
-    showAlert('success','LEVEL UP!',`Level ${S.level}! +5 Stat Points.`);
-    const el=document.getElementById('levelNum');el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');
-  }
-  document.getElementById('levelNum').textContent=S.level||1;
-  document.getElementById('xpVal').textContent=`${S.xp||0} / ${S.xpMax||1000} XP`;
-  document.getElementById('xpBar').style.width=Math.round(((S.xp||0)/(S.xpMax||1000))*100)+'%';
-}
-function showPopup(t,color){const el=document.getElementById('xpPopup');el.textContent=t;el.style.color=color;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');}
-
-// ══════════════════════════════════════
-// STATS
-// ══════════════════════════════════════
-function renderStats(){
-  if(!S)return;
-  const g=document.getElementById('statsGrid');g.innerHTML='';
-  Object.entries(S.stats||{}).forEach(([k,s])=>{
-    const d=document.createElement('div');d.className=`stat-card ${s.cls}`;
-    d.innerHTML=`<div class="stat-name">${s.name}</div><div class="stat-val">${s.val}</div><div class="stat-bar-wrap"><div class="stat-bar" style="width:${s.val}%"></div></div>`;
-    d.onclick=()=>{if((S.sp||0)<=0){showAlert('warning','No Points','Complete quests to earn stat points.');return;}S.sp--;S.stats[k].val=Math.min(100,S.stats[k].val+3);renderStats();showAlert('normal','Stat Up',`${s.name} upgraded!`);scheduleSave();};
-    g.appendChild(d);
-  });
-  document.getElementById('statPoints').textContent=S.sp||0;
-}
-
-// ══════════════════════════════════════
-// ALERT
-// ══════════════════════════════════════
-let alertTimer;
-function showAlert(type,msg,sub){
-  const el=document.getElementById('alert');el.className='system-alert '+type;
-  const hd={success:'◈ ACHIEVEMENT',warning:'⚠ WARNING',penalty:'☠ PENALTY',normal:'◈ SYSTEM'};
-  document.getElementById('alertHeader').textContent=hd[type]||'◈ SYSTEM';
-  document.getElementById('alertMsg').textContent=msg;
-  document.getElementById('alertSub').textContent=sub||'';
-  el.classList.add('show');clearTimeout(alertTimer);alertTimer=setTimeout(()=>el.classList.remove('show'),4000);
-}
-
-// ══════════════════════════════════════
-// PENALTY ZONE
-// ══════════════════════════════════════
-function checkPenalty(){
-  if(!S)return;
-  const today=new Date().toDateString();
-  if(S.lastQuestDate&&S.lastQuestDate!==today){
-    const missed=(S.quests||[]).filter(q=>!q.done&&!q.isPenalty);
-    if(missed.length){
-      document.getElementById('penaltyBanner').classList.add('show');
-      document.getElementById('penaltyDesc').textContent=`Missed ${missed.length} quest(s). Stat debuffs applied. Streaks reset for missed domains.`;
-      Object.keys(S.stats||{}).forEach(k=>S.stats[k].val=Math.max(1,S.stats[k].val-3));
-      const missedDomains=[...new Set(missed.map(q=>q.domain))];
-      missedDomains.forEach(d=>S.streaks[d]=0);
-      missed.forEach(q=>S.quests.push({id:S.nextId++,name:`[PENALTY] ${q.name}`,domain:q.domain,stat:q.stat,diff:'hard',baseXp:Math.round(q.baseXp*0.5),done:false,isPenalty:true,mult:null}));
-      showAlert('penalty','☠ PENALTY ZONE',`${missed.length} quests missed.`);
-      scheduleSave();
-    }
-  }
-  S.lastQuestDate=today;
-}
-
-// ══════════════════════════════════════
-// PERFORMANCE REPORT
-// ══════════════════════════════════════
-function getDomainScore(domain){
-  const qs=(S.quests||[]).filter(q=>q.domain===domain&&!q.isPenalty);
-  if(!qs.length)return{completion:0,discipline:0,focus:0,consistency:0,total:0};
-  const done=qs.filter(q=>q.done);
-  const completion=Math.round((done.length/qs.length)*100);
-  const earlyDone=done.filter(q=>q.mult>1).length;
-  const discipline=done.length?Math.min(100,Math.round((earlyDone/done.length)*100+(completion*0.4))):0;
-  const onTime=done.filter(q=>q.mult>=1).length;
-  const focus=done.length?Math.round((onTime/done.length)*100):0;
-  const streak=((S.streaks||{})[domain])||0;
-  const consistency=Math.min(100,streak*15);
-  const total=Math.round((completion+discipline+focus+consistency)/4);
-  return{completion,discipline,focus,consistency,total};
-}
-function scoreToRank(score){
-  if(score>=90)return{rank:'S',color:'var(--gold)'};
-  if(score>=75)return{rank:'A',color:'var(--green)'};
-  if(score>=55)return{rank:'B',color:'var(--blue)'};
-  if(score>=35)return{rank:'C',color:'var(--purple)'};
-  if(score>=15)return{rank:'D',color:'var(--orange)'};
-  return{rank:'E',color:'var(--red)'};
-}
-function drawRadar(){
-  const canvas=document.getElementById('radarCanvas');
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=Math.min(W,H)*0.36;
-  ctx.clearRect(0,0,W,H);
-  const labels=['DISCIPLINE','FOCUS','CONSISTENCY','COMPLETION','OVERALL'];
-  const domains=['personal','fitness','academic'];
-  const domColors=['rgba(0,212,255,0.7)','rgba(0,255,136,0.7)','rgba(198,120,255,0.7)'];
-  const N=labels.length;
-  for(let lv=1;lv<=4;lv++){ctx.beginPath();for(let i=0;i<=N;i++){const a=(i/N)*Math.PI*2-Math.PI/2,x=cx+Math.cos(a)*r*(lv/4),y=cy+Math.sin(a)*r*(lv/4);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.strokeStyle='rgba(0,212,255,0.1)';ctx.lineWidth=1;ctx.stroke();}
-  for(let i=0;i<N;i++){const a=(i/N)*Math.PI*2-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);ctx.strokeStyle='rgba(0,212,255,0.15)';ctx.lineWidth=1;ctx.stroke();ctx.fillStyle='rgba(200,232,255,0.55)';ctx.font='bold 8px Orbitron,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(labels[i],cx+Math.cos(a)*(r+22),cy+Math.sin(a)*(r+20));}
-  domains.forEach((domain,di)=>{
-    const sc=getDomainScore(domain);
-    const vals=[sc.discipline,sc.focus,sc.consistency,sc.completion,sc.total].map(v=>v/100);
-    ctx.beginPath();vals.forEach((v,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2,x=cx+Math.cos(a)*r*v,y=cy+Math.sin(a)*r*v;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
-    ctx.closePath();ctx.fillStyle=domColors[di].replace('0.7','0.1');ctx.fill();ctx.strokeStyle=domColors[di];ctx.lineWidth=2;ctx.stroke();
-    vals.forEach((v,i)=>{const a=(i/N)*Math.PI*2-Math.PI/2;ctx.beginPath();ctx.arc(cx+Math.cos(a)*r*v,cy+Math.sin(a)*r*v,3,0,Math.PI*2);ctx.fillStyle=domColors[di];ctx.fill();});
-  });
-}
-function renderDomainRanks(){
-  const el=document.getElementById('domainRanks');el.innerHTML='';
-  [{key:'personal',label:'PERSONAL LIFE'},{key:'fitness',label:'FITNESS & HEALTH'},{key:'academic',label:'ACADEMICS'}].forEach(({key,label})=>{
-    const sc=getDomainScore(key);const{rank}=scoreToRank(sc.total);
-    const card=document.createElement('div');card.className=`domain-rank-card ${key}`;
-    card.innerHTML=`<div class="dr-top"><div><div class="dr-domain">${label}</div></div><div class="dr-rank">${rank}-RANK</div></div>
-    <div class="dr-metrics"><div class="dr-metric"><div class="dr-metric-label">DISCIPLINE</div><div class="dr-metric-val">${sc.discipline}%</div></div><div class="dr-metric"><div class="dr-metric-label">FOCUS</div><div class="dr-metric-val">${sc.focus}%</div></div><div class="dr-metric"><div class="dr-metric-label">CONSISTENCY</div><div class="dr-metric-val">${sc.consistency}%</div></div></div>
-    <div class="dr-bar-row">
-      <div class="dr-bar-label"><span>Discipline</span><span>${sc.discipline}%</span></div><div class="dr-bar-wrap"><div class="dr-bar" style="width:${sc.discipline}%"></div></div>
-      <div class="dr-bar-label"><span>Focus</span><span>${sc.focus}%</span></div><div class="dr-bar-wrap"><div class="dr-bar" style="width:${sc.focus}%"></div></div>
-      <div class="dr-bar-label"><span>Consistency</span><span>${sc.consistency}%</span></div><div class="dr-bar-wrap"><div class="dr-bar" style="width:${sc.consistency}%"></div></div>
-    </div>`;
-    el.appendChild(card);
-  });
-}
-function renderWeekHistory(){
-  const el=document.getElementById('weekHistory');el.innerHTML='';
-  (S.history||[]).forEach(h=>{
-    const avg=Math.round((h.personal+h.fitness+h.academic)/3);
-    const row=document.createElement('div');row.className='week-row';
-    row.innerHTML=`<div class="week-day">${h.day}</div><div class="week-bars"><div class="week-bar-wrap personal"><div class="week-bar-fill" style="height:${h.personal}%"></div></div><div class="week-bar-wrap fitness"><div class="week-bar-fill" style="height:${h.fitness}%"></div></div><div class="week-bar-wrap academic"><div class="week-bar-fill" style="height:${h.academic}%"></div></div></div><div class="week-pct">${avg}%</div>`;
-    el.appendChild(row);
-  });
-}
-function generateAnalysis(){
-  const ps=getDomainScore('personal'),fs=getDomainScore('fitness'),as=getDomainScore('academic');
-  const overall=Math.round((ps.total+fs.total+as.total)/3);
-  const{rank}=scoreToRank(overall);
-  const sorted=[{key:'personal',sc:ps},{key:'fitness',sc:fs},{key:'academic',sc:as}].sort((a,b)=>b.sc.total-a.sc.total);
-  const best=sorted[0],worst=sorted[2];
-  document.getElementById('overallRankVal').textContent=rank;
-  document.getElementById('overallRankName').textContent=rank+'-RANK HUNTER';
-  document.getElementById('overallRankSub').textContent=overall>=70?'Strong hunter. Push to S-Rank.':overall>=40?'Developing hunter. Consistency is the key.':'E-Rank detected. Time to rise, Hunter.';
-  document.getElementById('streakPersonal').textContent=(S.streaks||{}).personal||0;
-  document.getElementById('streakFitness').textContent=(S.streaks||{}).fitness||0;
-  document.getElementById('streakAcademic').textContent=(S.streaks||{}).academic||0;
-  document.getElementById('perfAiText').textContent=`Strongest domain: ${best.key} (${best.sc.total}%). Weakest: ${worst.key} (${worst.sc.total}%). ${overall>=70?'You are performing well. Close the gap between domains to achieve S-Rank.':'Critical weaknesses detected. The System demands more focus and discipline from you.'}`;
-  const suggestions=[];
-  if(worst.sc.consistency<40)suggestions.push(`Build a ${worst.key} streak — complete at least 1 quest daily for 7 days.`);
-  if(ps.sc.discipline<50)suggestions.push('Complete personal quests 1hr+ before cutoff to boost discipline score.');
-  if(fs.sc.total<50)suggestions.push('Add 2+ fitness quests daily — physical stats are falling behind.');
-  if(as.sc.focus<60)suggestions.push('Academic quests must be done before cutoff — late study loses 50% XP.');
-  if(overall>=75)suggestions.push('Target S-Rank: maintain 90%+ completion across ALL 3 domains.');
-  if(!suggestions.length)suggestions.push('All domains strong. Maintain streaks and push for S-Rank.');
-  const sl=document.getElementById('suggestionList');sl.innerHTML='';
-  suggestions.forEach(s=>{const d=document.createElement('div');d.className='suggestion-item';d.innerHTML=`<span class="suggestion-arrow">→</span><span>${s}</span>`;sl.appendChild(d);});
-}
-function openPerfReport(){document.getElementById('perfOverlay').classList.add('show');renderDomainRanks();renderWeekHistory();generateAnalysis();setTimeout(drawRadar,100);}
-function closePerfReport(){document.getElementById('perfOverlay').classList.remove('show');}
-
-// ══════════════════════════════════════
-// MODALS
-// ══════════════════════════════════════
-function switchTab(name,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));el.classList.add('active');document.getElementById('tab-'+name).classList.add('active');}
-function openAddQuest(){document.getElementById('questModal').classList.add('show');}
-function openCutoffModal(){document.getElementById('cutoffInput').value=S.cutoff||'22:00';document.getElementById('cutoffModal').classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-function addQuest(){
-  const name=document.getElementById('questNameInput').value.trim();if(!name)return;
-  const diff=document.getElementById('questDiffInput').value;
-  const xpMap={easy:50,medium:100,hard:200};
-  if(!S.quests)S.quests=[];
-  S.quests.push({id:S.nextId++,name,domain:document.getElementById('questDomainInput').value,stat:document.getElementById('questStatInput').value,diff,baseXp:xpMap[diff],done:false,isPenalty:false,mult:null});
-  document.getElementById('questNameInput').value='';closeModal('questModal');renderQuests();showAlert('normal','Quest Registered',name);scheduleSave();
-}
-function saveCutoff(){
-  const val=document.getElementById('cutoffInput').value;if(!val)return;
-  S.cutoff=val;document.getElementById('cutoffDisplay').textContent=val;document.getElementById('cutoffSettingVal').textContent=val;
-  closeModal('cutoffModal');showAlert('normal','Cutoff Updated',`Set to ${val}.`);scheduleSave();
-}
-function changeName(){
-  const n=prompt('Hunter name:',S.hunterName);if(!n)return;
-  S.hunterName=n.toUpperCase();document.getElementById('hunterName').textContent=S.hunterName;document.getElementById('nameSettingVal').textContent=S.hunterName;scheduleSave();
-}
-const reviewResponses=['The System notes your reflection. Endurance remains weak. Assign more physical quests.','Consistency score is your bottleneck. Daily action beats occasional bursts every time.','Promising academic output. But fitness lags. An unbalanced hunter cannot reach S-Rank.','Consistent daily review unlocks hidden system bonuses. Do not break this ritual.'];
-function submitReview(){if(!document.getElementById('reviewText').value.trim())return;addXP(75,'var(--purple)');document.getElementById('aiText').textContent=reviewResponses[Math.floor(Math.random()*reviewResponses.length)];document.getElementById('aiResponse').classList.add('show');showAlert('normal','Review Submitted','+75 XP earned.');scheduleSave();}
-function submitWeekly(){if(!document.getElementById('weeklyText').value.trim())return;addXP(300,'var(--purple)');S.sp=(S.sp||0)+2;renderStats();showAlert('success','Weekly Complete','+300 XP + 2 Stat Points!');scheduleSave();}
-
-// ══════════════════════════════════════
-// INIT
-// ══════════════════════════════════════
-setInterval(updateClock,1000);
-setInterval(renderQuests,30000);
-updateClock();
-
-// Auto-login if token exists
-if(token){loadData();}
-</script>
+  <script src="js/app.js"></script>
 </body>
+
 </html>
