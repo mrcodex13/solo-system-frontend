@@ -1,8 +1,8 @@
 // ══════════════════════════════════════
-// CONFIG — change this to your backend URL after deploying
-// ══════════════════════════════════════
-const API = 'https://solo-system-backend-production.up.railway.app/api';
-// During local testing use: const API = 'http://localhost:5000/api';
+  // CONFIG — change this to your backend URL after deploying
+  // ══════════════════════════════════════
+ const API = 'https://solo-system-backend-production.up.railway.app/api';
+// const API = 'http://localhost:5000/api';
 
 // ══════════════════════════════════════
 // AUTH STATE
