@@ -406,6 +406,20 @@ function changeName(){
   const n=prompt('Hunter name:',S.hunterName);if(!n)return;
   S.hunterName=n.toUpperCase();document.getElementById('hunterName').textContent=S.hunterName;document.getElementById('nameSettingVal').textContent=S.hunterName;scheduleSave();
 }
+function openPhoneModal() {
+  document.getElementById('phoneInput').value = S.phone || '';
+  document.getElementById('phoneModal').classList.add('show');
+}
+
+function savePhone() {
+  const phone = document.getElementById('phoneInput').value.trim();
+  if (!phone) return;
+  S.phone = phone;
+  document.getElementById('phoneSettingVal').textContent = phone;
+  closeModal('phoneModal');
+  showAlert('normal', 'WhatsApp Set', 'Notifications enabled for ' + phone);
+  scheduleSave();
+}
 const reviewResponses=['The System notes your reflection. Endurance remains weak. Assign more physical quests.','Consistency score is your bottleneck. Daily action beats occasional bursts every time.','Promising academic output. But fitness lags. An unbalanced hunter cannot reach S-Rank.','Consistent daily review unlocks hidden system bonuses. Do not break this ritual.'];
 function submitReview(){if(!document.getElementById('reviewText').value.trim())return;addXP(75,'var(--purple)');document.getElementById('aiText').textContent=reviewResponses[Math.floor(Math.random()*reviewResponses.length)];document.getElementById('aiResponse').classList.add('show');showAlert('normal','Review Submitted','+75 XP earned.');scheduleSave();}
 function submitWeekly(){if(!document.getElementById('weeklyText').value.trim())return;addXP(300,'var(--purple)');S.sp=(S.sp||0)+2;renderStats();showAlert('success','Weekly Complete','+300 XP + 2 Stat Points!');scheduleSave();}
