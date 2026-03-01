@@ -1,7 +1,7 @@
 // ══════════════════════════════════════
   // CONFIG — change this to your backend URL after deploying
   // ══════════════════════════════════════
- const API = 'https://solo-system-backend-production.up.railway.app/api';
+const API = 'https://solo-system-backend.onrender.com/api'; 
 // const API = 'http://localhost:5000/api';
 
 // ══════════════════════════════════════
