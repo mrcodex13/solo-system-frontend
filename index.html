@@ -1,241 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE SYSTEM</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE SYSTEM</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=Orbitron:wght@400;600;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
-<div class="scanline"></div>
+  <div class="scanline"></div>
 
-<!-- ══ AUTH SCREEN ══ -->
-<div class="auth-screen" id="authScreen">
-  <div class="auth-box">
-    <div class="auth-logo">◈ SYSTEM INTERFACE</div>
-    <div class="auth-title">THE SYSTEM</div>
-    <div class="auth-sub">Identify yourself, Hunter.</div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" onclick="switchAuthTab('login',this)">LOGIN</div>
-      <div class="auth-tab" onclick="switchAuthTab('register',this)">REGISTER</div>
-    </div>
-    <div id="loginForm">
-      <div class="auth-label">USERNAME</div>
-      <input class="auth-input" id="loginUser" type="text" placeholder="your_username" autocomplete="username">
-      <div class="auth-label">PASSWORD</div>
-      <input class="auth-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
-      <button class="auth-btn" onclick="login()">ENTER THE SYSTEM</button>
-    </div>
-    <div id="registerForm" style="display:none">
-      <div class="auth-label">HUNTER NAME (shown in app)</div>
-      <input class="auth-input" id="regHunter" type="text" placeholder="SUNG JIN-WOO">
-      <div class="auth-label">USERNAME</div>
-      <input class="auth-input" id="regUser" type="text" placeholder="your_username" autocomplete="username">
-      <div class="auth-label">PASSWORD (min 6 chars)</div>
-      <input class="auth-input" id="regPass" type="password" placeholder="••••••••" autocomplete="new-password">
-      <button class="auth-btn" onclick="register()">CREATE HUNTER</button>
-    </div>
-    <div class="auth-error" id="authError"></div>
-  </div>
-</div>
-
-<!-- ══ MAIN APP ══ -->
-<div class="system-alert normal" id="alert">
-  <div class="alert-header" id="alertHeader">◈ SYSTEM NOTIFICATION</div>
-  <div class="alert-msg" id="alertMsg"></div>
-  <div class="alert-sub" id="alertSub"></div>
-</div>
-<div class="xp-popup" id="xpPopup"></div>
-
-<div class="app" id="mainApp" style="display:none">
-  <!-- Sync bar -->
-  <div class="sync-bar">
-    <div class="sync-status">
-      <div class="sync-dot ok" id="syncDot"></div>
-      <span id="syncText" style="color:var(--text-dim)">Synced</span>
-    </div>
-    <button class="logout-btn" onclick="logout()">LOGOUT</button>
-  </div>
-
-  <div class="header">
-    <div class="system-label">◈ SYSTEM INTERFACE v3.0</div>
-    <div class="hunter-name" id="hunterName">HUNTER</div>
-    <div class="rank-badge">E-RANK → RISING</div>
-    <div class="level-panel">
-      <div class="level-row">
-        <div><div class="level-label">LEVEL</div><div class="level-num" id="levelNum">1</div></div>
-        <div class="xp-info"><div class="xp-val" id="xpVal">0 / 1000 XP</div><div class="xp-label">EXPERIENCE</div></div>
+  <!-- ══ AUTH SCREEN ══ -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-box">
+      <div class="auth-logo">◈ SYSTEM INTERFACE</div>
+      <div class="auth-title">THE SYSTEM</div>
+      <div class="auth-sub">Identify yourself, Hunter.</div>
+      <div class="auth-tabs">
+        <div class="auth-tab active" onclick="switchAuthTab('login',this)">LOGIN</div>
+        <div class="auth-tab" onclick="switchAuthTab('register',this)">REGISTER</div>
       </div>
-      <div class="xp-bar-wrap"><div class="xp-bar" id="xpBar" style="width:0%"></div></div>
-    </div>
-    <div class="cutoff-strip">
-      <div><div class="cutoff-label">DAILY CUTOFF</div><div class="cutoff-time" id="cutoffDisplay">22:00</div></div>
-      <button class="cutoff-edit" onclick="openCutoffModal()">EDIT</button>
-    </div>
-    <div class="live-clock">
-      <div class="clock-now" id="clockNow">--:--:--</div>
-      <div class="time-status ok" id="timeStatus">ON TIME</div>
-    </div>
-    <button class="perf-btn" onclick="openPerfReport()">◈ PERFORMANCE REPORT ↗</button>
-  </div>
-
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('quests',this)">QUESTS</div>
-    <div class="tab" onclick="switchTab('stats',this)">STATS</div>
-    <div class="tab" onclick="switchTab('review',this)">REVIEW</div>
-    <div class="tab" onclick="switchTab('rules',this)">RULES</div>
-  </div>
-
-  <div class="section active" id="tab-quests">
-    <div class="penalty-banner" id="penaltyBanner">
-      <div class="penalty-title">⚠ PENALTY ZONE</div>
-      <div class="penalty-desc" id="penaltyDesc"></div>
-    </div>
-    <div class="domain-filter">
-      <button class="df-btn all active" onclick="filterDomain('all',this)">ALL</button>
-      <button class="df-btn personal" onclick="filterDomain('personal',this)">PERSONAL</button>
-      <button class="df-btn fitness" onclick="filterDomain('fitness',this)">FITNESS</button>
-      <button class="df-btn academic" onclick="filterDomain('academic',this)">ACADEMIC</button>
-    </div>
-    <div class="section-title">DAILY QUESTS</div>
-    <div id="questList"></div>
-    <button class="add-quest-btn" onclick="openAddQuest()">+ ADD NEW QUEST</button>
-  </div>
-
-  <div class="section" id="tab-stats">
-    <div class="stat-points-banner">
-      <div><div class="points-label">STAT POINTS AVAILABLE</div></div>
-      <div class="points-val" id="statPoints">0</div>
-    </div>
-    <div class="section-title">ATTRIBUTES</div>
-    <div class="stats-grid" id="statsGrid"></div>
-  </div>
-
-  <div class="section" id="tab-review">
-    <div class="section-title">DAILY REVIEW</div>
-    <div class="review-card">
-      <h3>◈ END OF DAY REPORT</h3>
-      <textarea class="review-textarea" id="reviewText" placeholder="Hunter, reflect on today...&#10;• What quests did you complete?&#10;• What held you back?&#10;• What will you change tomorrow?" rows="6"></textarea>
-      <button class="system-btn" onclick="submitReview()">SUBMIT REPORT TO SYSTEM</button>
-      <div class="ai-response" id="aiResponse"><div class="ai-label">◈ SYSTEM ANALYSIS</div><div class="ai-text" id="aiText"></div></div>
-    </div>
-    <div class="section-title">WEEKLY EVALUATION</div>
-    <div class="review-card">
-      <h3>◈ WEEKLY BOSS ASSESSMENT</h3>
-      <textarea class="review-textarea" id="weeklyText" placeholder="Evaluate your week...&#10;• Which domain performed best?&#10;• Where did you fall short?" rows="5"></textarea>
-      <button class="system-btn" onclick="submitWeekly()">COMPLETE WEEKLY EVALUATION</button>
+      <div id="loginForm">
+        <div class="auth-label">USERNAME</div>
+        <input class="auth-input" id="loginUser" type="text" placeholder="your_username" autocomplete="username">
+        <div class="auth-label">PASSWORD</div>
+        <input class="auth-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button class="auth-btn" onclick="login()">ENTER THE SYSTEM</button>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="auth-label">HUNTER NAME (shown in app)</div>
+        <input class="auth-input" id="regHunter" type="text" placeholder="SUNG JIN-WOO">
+        <div class="auth-label">USERNAME</div>
+        <input class="auth-input" id="regUser" type="text" placeholder="your_username" autocomplete="username">
+        <div class="auth-label">PASSWORD (min 6 chars)</div>
+        <input class="auth-input" id="regPass" type="password" placeholder="••••••••" autocomplete="new-password">
+        <button class="auth-btn" onclick="register()">CREATE HUNTER</button>
+      </div>
+      <div class="auth-error" id="authError"></div>
     </div>
   </div>
 
-  <div class="section" id="tab-rules">
-    <div class="section-title">XP TIME RULES</div>
-    <div class="xp-rules">
-      <div class="xp-rule"><div class="xp-rule-label">⚡ Early (1hr+ before cutoff)</div><div class="xp-rule-val" style="color:var(--gold)">+25% BONUS</div></div>
-      <div class="xp-rule"><div class="xp-rule-label">✓ On time</div><div class="xp-rule-val" style="color:var(--green)">100% XP</div></div>
-      <div class="xp-rule"><div class="xp-rule-label">⚠ After cutoff</div><div class="xp-rule-val" style="color:var(--orange)">50% XP</div></div>
-      <div class="xp-rule"><div class="xp-rule-label">☠ Missed</div><div class="xp-rule-val" style="color:var(--red)">PENALTY ZONE</div></div>
-    </div>
-    <div class="section-title">SETTINGS</div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">DAILY CUTOFF TIME</div><div class="settings-row-val" id="cutoffSettingVal">22:00</div></div>
-      <button class="settings-edit-btn" onclick="openCutoffModal()">CHANGE</button>
-    </div>
-    <div class="settings-row">
-      <div><div class="settings-row-label">HUNTER NAME</div><div class="settings-row-val" id="nameSettingVal">HUNTER</div></div>
-      <button class="settings-edit-btn" onclick="changeName()">CHANGE</button>
-    </div>
+  <!-- ══ MAIN APP ══ -->
+  <div class="system-alert normal" id="alert">
+    <div class="alert-header" id="alertHeader">◈ SYSTEM NOTIFICATION</div>
+    <div class="alert-msg" id="alertMsg"></div>
+    <div class="alert-sub" id="alertSub"></div>
   </div>
-</div>
+  <div class="xp-popup" id="xpPopup"></div>
 
-<!-- PERFORMANCE REPORT -->
-<div class="perf-overlay" id="perfOverlay">
-  <div class="perf-modal">
-    <div class="perf-header">
-      <div class="perf-title">◈ PERFORMANCE REPORT</div>
-      <button class="perf-close" onclick="closePerfReport()">✕ CLOSE</button>
+  <div class="app" id="mainApp" style="display:none">
+    <!-- Sync bar -->
+    <div class="sync-bar">
+      <div class="sync-status">
+        <div class="sync-dot ok" id="syncDot"></div>
+        <span id="syncText" style="color:var(--text-dim)">Synced</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">LOGOUT</button>
     </div>
-    <div class="overall-rank">
-      <div class="rank-label">OVERALL HUNTER RANK</div>
-      <div class="rank-val" id="overallRankVal">E</div>
-      <div class="rank-name" id="overallRankName">E-RANK HUNTER</div>
-      <div class="rank-sub" id="overallRankSub"></div>
+
+    <div class="header">
+      <div class="system-label">◈ SYSTEM INTERFACE v3.0</div>
+      <div class="hunter-name" id="hunterName">HUNTER</div>
+      <div class="rank-badge">E-RANK → RISING</div>
+      <div class="level-panel">
+        <div class="level-row">
+          <div>
+            <div class="level-label">LEVEL</div>
+            <div class="level-num" id="levelNum">1</div>
+          </div>
+          <div class="xp-info">
+            <div class="xp-val" id="xpVal">0 / 1000 XP</div>
+            <div class="xp-label">EXPERIENCE</div>
+          </div>
+        </div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar" id="xpBar" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="cutoff-strip">
+        <div>
+          <div class="cutoff-label">DAILY CUTOFF</div>
+          <div class="cutoff-time" id="cutoffDisplay">22:00</div>
+        </div>
+        <button class="cutoff-edit" onclick="openCutoffModal()">EDIT</button>
+      </div>
+      <div class="live-clock">
+        <div class="clock-now" id="clockNow">--:--:--</div>
+        <div class="time-status ok" id="timeStatus">ON TIME</div>
+      </div>
+      <button class="perf-btn" onclick="openPerfReport()">◈ PERFORMANCE REPORT ↗</button>
     </div>
-    <div class="streaks-row">
-      <div class="streak-card personal"><div class="streak-domain">PERSONAL</div><div class="streak-num" id="streakPersonal">0</div><div class="streak-unit">day streak</div></div>
-      <div class="streak-card fitness"><div class="streak-domain">FITNESS</div><div class="streak-num" id="streakFitness">0</div><div class="streak-unit">day streak</div></div>
-      <div class="streak-card academic"><div class="streak-domain">ACADEMIC</div><div class="streak-num" id="streakAcademic">0</div><div class="streak-unit">day streak</div></div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('quests',this)">QUESTS</div>
+      <div class="tab" onclick="switchTab('stats',this)">STATS</div>
+      <div class="tab" onclick="switchTab('review',this)">REVIEW</div>
+      <div class="tab" onclick="switchTab('rules',this)">RULES</div>
     </div>
-    <div class="radar-wrap">
-      <div class="radar-title">DOMAIN PERFORMANCE RADAR</div>
-      <canvas id="radarCanvas" width="280" height="260"></canvas>
+
+    <div class="section active" id="tab-quests">
+      <div class="penalty-banner" id="penaltyBanner">
+        <div class="penalty-title">⚠ PENALTY ZONE</div>
+        <div class="penalty-desc" id="penaltyDesc"></div>
+      </div>
+      <div class="domain-filter">
+        <button class="df-btn all active" onclick="filterDomain('all',this)">ALL</button>
+        <button class="df-btn personal" onclick="filterDomain('personal',this)">PERSONAL</button>
+        <button class="df-btn fitness" onclick="filterDomain('fitness',this)">FITNESS</button>
+        <button class="df-btn academic" onclick="filterDomain('academic',this)">ACADEMIC</button>
+      </div>
+      <div class="section-title">DAILY QUESTS</div>
+      <div id="questList"></div>
+      <button class="add-quest-btn" onclick="openAddQuest()">+ ADD NEW QUEST</button>
     </div>
-    <div class="domain-ranks" id="domainRanks"></div>
-    <div class="week-history">
-      <h3>◈ 7-DAY COMPLETION HISTORY</h3>
-      <div id="weekHistory"></div>
-      <div class="week-legend">
-        <div class="wl-item"><div class="wl-dot" style="background:var(--personal)"></div>Personal</div>
-        <div class="wl-item"><div class="wl-dot" style="background:var(--fitness)"></div>Fitness</div>
-        <div class="wl-item"><div class="wl-dot" style="background:var(--academic)"></div>Academic</div>
+
+    <div class="section" id="tab-stats">
+      <div class="stat-points-banner">
+        <div>
+          <div class="points-label">STAT POINTS AVAILABLE</div>
+        </div>
+        <div class="points-val" id="statPoints">0</div>
+      </div>
+      <div class="section-title">ATTRIBUTES</div>
+      <div class="stats-grid" id="statsGrid"></div>
+    </div>
+
+    <div class="section" id="tab-review">
+      <div class="section-title">DAILY REVIEW</div>
+      <div class="review-card">
+        <h3>◈ END OF DAY REPORT</h3>
+        <textarea class="review-textarea" id="reviewText"
+          placeholder="Hunter, reflect on today...&#10;• What quests did you complete?&#10;• What held you back?&#10;• What will you change tomorrow?"
+          rows="6"></textarea>
+        <button class="system-btn" onclick="submitReview()">SUBMIT REPORT TO SYSTEM</button>
+        <div class="ai-response" id="aiResponse">
+          <div class="ai-label">◈ SYSTEM ANALYSIS</div>
+          <div class="ai-text" id="aiText"></div>
+        </div>
+      </div>
+      <div class="section-title">WEEKLY EVALUATION</div>
+      <div class="review-card">
+        <h3>◈ WEEKLY BOSS ASSESSMENT</h3>
+        <textarea class="review-textarea" id="weeklyText"
+          placeholder="Evaluate your week...&#10;• Which domain performed best?&#10;• Where did you fall short?"
+          rows="5"></textarea>
+        <button class="system-btn" onclick="submitWeekly()">COMPLETE WEEKLY EVALUATION</button>
       </div>
     </div>
-    <div class="ai-analysis">
-      <div class="ai-analysis-title">◈ SYSTEM PERSONALIZED ANALYSIS</div>
-      <div class="ai-analysis-text" id="perfAiText"></div>
-      <div class="suggestion-block">
-        <div class="suggestion-title">SYSTEM RECOMMENDATIONS</div>
-        <div id="suggestionList"></div>
+
+    <div class="section" id="tab-rules">
+      <div class="section-title">XP TIME RULES</div>
+      <div class="xp-rules">
+        <div class="xp-rule">
+          <div class="xp-rule-label">⚡ Early (1hr+ before cutoff)</div>
+          <div class="xp-rule-val" style="color:var(--gold)">+25% BONUS</div>
+        </div>
+        <div class="xp-rule">
+          <div class="xp-rule-label">✓ On time</div>
+          <div class="xp-rule-val" style="color:var(--green)">100% XP</div>
+        </div>
+        <div class="xp-rule">
+          <div class="xp-rule-label">⚠ After cutoff</div>
+          <div class="xp-rule-val" style="color:var(--orange)">50% XP</div>
+        </div>
+        <div class="xp-rule">
+          <div class="xp-rule-label">☠ Missed</div>
+          <div class="xp-rule-val" style="color:var(--red)">PENALTY ZONE</div>
+        </div>
+      </div>
+      <div class="section-title">SETTINGS</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">DAILY CUTOFF TIME</div>
+          <div class="settings-row-val" id="cutoffSettingVal">22:00</div>
+        </div>
+        <button class="settings-edit-btn" onclick="openCutoffModal()">CHANGE</button>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-row-label">WHATSAPP NUMBER</div>
+          <div class="settings-row-val" id="phoneSettingVal">Not set</div>
+        </div>
+        <button class="settings-edit-btn" onclick="openPhoneModal()">SET</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Quest Modal -->
-<div class="modal-overlay" id="questModal">
-  <div class="modal">
-    <h3>◈ NEW QUEST REGISTRATION</h3>
-    <div class="modal-label">QUEST NAME</div>
-    <input type="text" id="questNameInput" placeholder="Describe your quest..." maxlength="60">
-    <div class="modal-label">DOMAIN</div>
-    <select id="questDomainInput">
-      <option value="personal">🔵 PERSONAL</option>
-      <option value="fitness">🟢 FITNESS</option>
-      <option value="academic">🟣 ACADEMIC</option>
-    </select>
-    <div class="modal-label">LINKED STAT</div>
-    <select id="questStatInput">
-      <option value="STR">STRENGTH</option><option value="AGI">AGILITY</option>
-      <option value="INT">INTELLIGENCE</option><option value="END">ENDURANCE</option>
-      <option value="SEN">SENSE</option><option value="VIT">VITALITY</option>
-    </select>
-    <div class="modal-label">DIFFICULTY</div>
-    <select id="questDiffInput">
-      <option value="easy">EASY — 50 XP</option>
-      <option value="medium">MEDIUM — 100 XP</option>
-      <option value="hard">HARD — 200 XP</option>
-    </select>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('questModal')">CANCEL</button>
-      <button class="btn-confirm" onclick="addQuest()">REGISTER</button>
+  <!-- PERFORMANCE REPORT -->
+  <div class="perf-overlay" id="perfOverlay">
+    <div class="perf-modal">
+      <div class="perf-header">
+        <div class="perf-title">◈ PERFORMANCE REPORT</div>
+        <button class="perf-close" onclick="closePerfReport()">✕ CLOSE</button>
+      </div>
+      <div class="overall-rank">
+        <div class="rank-label">OVERALL HUNTER RANK</div>
+        <div class="rank-val" id="overallRankVal">E</div>
+        <div class="rank-name" id="overallRankName">E-RANK HUNTER</div>
+        <div class="rank-sub" id="overallRankSub"></div>
+      </div>
+      <div class="streaks-row">
+        <div class="streak-card personal">
+          <div class="streak-domain">PERSONAL</div>
+          <div class="streak-num" id="streakPersonal">0</div>
+          <div class="streak-unit">day streak</div>
+        </div>
+        <div class="streak-card fitness">
+          <div class="streak-domain">FITNESS</div>
+          <div class="streak-num" id="streakFitness">0</div>
+          <div class="streak-unit">day streak</div>
+        </div>
+        <div class="streak-card academic">
+          <div class="streak-domain">ACADEMIC</div>
+          <div class="streak-num" id="streakAcademic">0</div>
+          <div class="streak-unit">day streak</div>
+        </div>
+      </div>
+      <div class="radar-wrap">
+        <div class="radar-title">DOMAIN PERFORMANCE RADAR</div>
+        <canvas id="radarCanvas" width="280" height="260"></canvas>
+      </div>
+      <div class="domain-ranks" id="domainRanks"></div>
+      <div class="week-history">
+        <h3>◈ 7-DAY COMPLETION HISTORY</h3>
+        <div id="weekHistory"></div>
+        <div class="week-legend">
+          <div class="wl-item">
+            <div class="wl-dot" style="background:var(--personal)"></div>Personal
+          </div>
+          <div class="wl-item">
+            <div class="wl-dot" style="background:var(--fitness)"></div>Fitness
+          </div>
+          <div class="wl-item">
+            <div class="wl-dot" style="background:var(--academic)"></div>Academic
+          </div>
+        </div>
+      </div>
+      <div class="ai-analysis">
+        <div class="ai-analysis-title">◈ SYSTEM PERSONALIZED ANALYSIS</div>
+        <div class="ai-analysis-text" id="perfAiText"></div>
+        <div class="suggestion-block">
+          <div class="suggestion-title">SYSTEM RECOMMENDATIONS</div>
+          <div id="suggestionList"></div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Cutoff Modal -->
-<div class="modal-overlay" id="cutoffModal">
-  <div class="modal" style="border-top-color:var(--purple);border-color:rgba(123,47,255,0.35);">
-    <h3 style="color:var(--purple);">◈ SET DAILY CUTOFF</h3>
-    <div class="modal-label">TIME (24H)</div>
-    <input type="time" id="cutoffInput" value="22:00">
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('cutoffModal')">CANCEL</button>
-      <button class="btn-confirm purple-confirm" onclick="saveCutoff()">SAVE</button>
+  <!-- Quest Modal -->
+  <div class="modal-overlay" id="questModal">
+    <div class="modal">
+      <h3>◈ NEW QUEST REGISTRATION</h3>
+      <div class="modal-label">QUEST NAME</div>
+      <input type="text" id="questNameInput" placeholder="Describe your quest..." maxlength="60">
+      <div class="modal-label">DOMAIN</div>
+      <select id="questDomainInput">
+        <option value="personal">🔵 PERSONAL</option>
+        <option value="fitness">🟢 FITNESS</option>
+        <option value="academic">🟣 ACADEMIC</option>
+      </select>
+      <div class="modal-label">LINKED STAT</div>
+      <select id="questStatInput">
+        <option value="STR">STRENGTH</option>
+        <option value="AGI">AGILITY</option>
+        <option value="INT">INTELLIGENCE</option>
+        <option value="END">ENDURANCE</option>
+        <option value="SEN">SENSE</option>
+        <option value="VIT">VITALITY</option>
+      </select>
+      <div class="modal-label">DIFFICULTY</div>
+      <select id="questDiffInput">
+        <option value="easy">EASY — 50 XP</option>
+        <option value="medium">MEDIUM — 100 XP</option>
+        <option value="hard">HARD — 200 XP</option>
+      </select>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('questModal')">CANCEL</button>
+        <button class="btn-confirm" onclick="addQuest()">REGISTER</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script src="/js/app.js"></script>
+  <!-- Cutoff Modal -->
+  <div class="modal-overlay" id="cutoffModal">
+    <div class="modal" style="border-top-color:var(--purple);border-color:rgba(123,47,255,0.35);">
+      <h3 style="color:var(--purple);">◈ SET DAILY CUTOFF</h3>
+      <div class="modal-label">TIME (24H)</div>
+      <input type="time" id="cutoffInput" value="22:00">
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('cutoffModal')">CANCEL</button>
+        <button class="btn-confirm purple-confirm" onclick="saveCutoff()">SAVE</button>
+      </div>
+      <!-- hellow -->
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
 </body>
-</html>
+<div class="modal-overlay" id="phoneModal">
+  <div class="modal">
+    <h3>WHATSAPP NOTIFICATIONS</h3>
+    <div class="modal-label">YOUR PHONE NUMBER</div>
+    <input type="tel" id="phoneInput" placeholder="+91XXXXXXXXXX">
+    <div style="font-family:monospace;font-size:11px;color:var(--text-dim);margin-top:10px;line-height:1.8;">
+      Include country code e.g. +919876543210
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('phoneModal')">CANCEL</button>
+      <button class="btn-confirm" onclick="savePhone()">SAVE</button>
+    </div>
+  </div>
+</div>
 
+
+</html>
